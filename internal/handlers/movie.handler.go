@@ -19,7 +19,7 @@ func NewMovieHandler(mr *repositories.MovieRepository) *MovieHandler {
 }
 
 func (m *MovieHandler) UpdateMovie(ctx *gin.Context) {
-	idParam, err := strconv.Atoi(ctx.Query("id"))
+	idParam, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error":   fmt.Sprintf("invalid id parameter: %s", err),
@@ -37,5 +37,24 @@ func (m *MovieHandler) UpdateMovie(ctx *gin.Context) {
 		return
 	}
 
-	m.mr.UpdateMovieData(ctx, updateMovie, idParam)
+	ctag, err := m.mr.UpdateMovieData(ctx, updateMovie, idParam)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error":   err.Error(),
+			"success": false,
+		})
+		return
+	}
+	if ctag.RowsAffected() == 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error":   fmt.Sprintf("there is no movie w/ ID, %d", idParam),
+			"success": false,
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{
+		"result":  fmt.Sprintf("successfully update movie w/ ID, %d", idParam),
+		"success": true,
+	})
 }
