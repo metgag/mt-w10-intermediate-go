@@ -41,7 +41,8 @@ func (a *AuthHandler) AddUser(ctx *gin.Context) {
 
 	id, err := a.ar.AddNewUser(ctx.Request.Context(), reg)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
+		ctx.JSON(http.StatusConflict, gin.H{
+			"error":   "email address is already registered. Please use a different email or log in",
 			"success": false,
 		})
 		return
