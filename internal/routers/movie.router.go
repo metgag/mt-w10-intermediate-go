@@ -11,5 +11,5 @@ func InitMovieRouter(r *gin.Engine, dbpool *pgxpool.Pool) {
 	mr := repositories.NewMovieRepository(dbpool)
 	mh := handlers.NewMovieHandler(mr)
 
-	r.PATCH("/movie", mh.UpdateMovie)
+	r.PATCH("/movie/:id", mh.UpdateMovie)
 }
